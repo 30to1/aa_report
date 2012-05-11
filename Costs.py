@@ -2,9 +2,11 @@ import math
 import FightUtils
 
 # get [PlayerFightCosts, PlayerFightCosts] for a given fight, skipping deaths near the end of the game.
-def get_player_fight_costs(game, fight, ignore_end_frames):
-    final_frame = game.aa_list[ len(game.aa_list)-1].died_frame - ignore_end_frames
-    born,rein,dead = FightUtils.get_fight_participants(game,fight, final_frame)
+def get_player_fight_costs(game, fight, ignore_end_frames, born = None, rein = None, dead = None):
+
+    if not (born and rein and dead):
+        final_frame = game.aa_list[ len(game.aa_list)-1].died_frame - ignore_end_frames
+        born,rein,dead = FightUtils.get_fight_participants(game,fight, final_frame)
 
     # this method gets called around 100,000 times in 10k games
     # run time is aprox 45 seconds
