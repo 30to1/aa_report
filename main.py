@@ -21,7 +21,7 @@ def main():
     delimiter = '\t'
     args = sys.argv[1:]
     if "-h" in args:
-        print "main.py  -f [json games file] -m [max_frames_gap] -e [ignore_end_frames_count] -l [minimum_gross_losses] -d [delimiter]"
+        print "main.py  -f [json games file] -m [max_frames_gap] -e [ignore_end_frames_count] -l [minimum_gross_losses] -c [limit_after_ratio_mult] -d [delimiter]"
         return
     else:
         if "-f" in args:
