@@ -69,7 +69,7 @@ class NetFightCosts(object):
         if self.army_ratio == 0 or self.army_ratio_after == 0 :
             self.log_ratio_change = None
         else:
-            self.log_ratio_change = math.log(self.army_ratio) - math.log(self.army_ratio_after)
+            self.log_ratio_change = math.log(self.army_ratio_after) - math.log(self.army_ratio)
 
         self.net_start = p1.start_cost - p2.start_cost
         self.net_rein = p1.rein_cost - p2.rein_cost
