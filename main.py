@@ -1,6 +1,5 @@
 import datetime
 import sys
-import ArmyRatioReport
 import Objs
 import util
 import json
@@ -12,7 +11,7 @@ def load_games_from_json(filename='test.json.txt'):
         games.append( Objs.Game.from_raw( raw_game ) )
     return games
 
-def main():
+def main( report_func ):
     filename = "test.json.txt"
     max_frames_gap = 16*20
     ignore_end_frames = 16*10
@@ -44,7 +43,7 @@ def main():
     print 'start load', datetime.datetime.now()
     games = load_games_from_json( filename )
     print 'load complete', datetime.datetime.now()
-    columns, bucketed_sums = ArmyRatioReport.get_report(games, max_frames_gap, ignore_end_frames, minimum_gross_losses, limit_change_ratio_mult)
+    columns, bucketed_sums = report_func(games, max_frames_gap, ignore_end_frames, minimum_gross_losses, limit_change_ratio_mult)
     print 'completed', datetime.datetime.now()
 
     print delimiter.join(columns)
@@ -56,5 +55,3 @@ def main():
             lines.append(str(value))
         print delimiter.join(lines)
 
-if __name__ == "__main__":
-    main()
