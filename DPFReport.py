@@ -29,16 +29,16 @@ def get_report(games, max_frame_gap = 16*20, ignore_end_frames = 16*10, minimum_
                         working_buckets.setdefault(key,[]).append(net_costs)
 
     complete_buckets = {}
-    for army_ratio_bucket, net_costs in working_buckets.iteritems():
+    for dpf_ratio_bucket, net_costs in working_buckets.iteritems():
         count = len( net_costs )
-        log_count = log_count_by_bucket[army_ratio_bucket] if army_ratio_bucket in log_count_by_bucket else 1
+        log_count = log_count_by_bucket[dpf_ratio_bucket] if dpf_ratio_bucket in log_count_by_bucket else 1
 
         # wasteful for clarity
         net_start        = sum( nc.net_start        for nc in net_costs ) / count
         net_rein         = sum( nc.net_rein         for nc in net_costs ) / count
         net_remain       = sum( nc.net_remaining    for nc in net_costs ) / count
         net_kill         = sum( nc.net_kills        for nc in net_costs ) / count
-        army_ratio_after = sum( nc.army_ratio_after for nc in net_costs ) / count - army_ratio_bucket
+        army_ratio_after = sum( nc.army_ratio_after for nc in net_costs ) / count - dpf_ratio_bucket
 
         log_change       = math.exp( sum( nc.log_ratio_change for nc in net_costs if nc.log_ratio_change ) / log_count )
 
@@ -47,11 +47,11 @@ def get_report(games, max_frame_gap = 16*20, ignore_end_frames = 16*10, minimum_
         gross_remain     = sum( nc.gross_remain for nc in net_costs ) / count
         gross_rein       = sum( nc.gross_rein   for nc in net_costs ) / count
 
-        complete_buckets[army_ratio_bucket] = [army_ratio_bucket, net_start, net_rein, net_remain,
+        complete_buckets[dpf_ratio_bucket] = [dpf_ratio_bucket, net_start, net_rein, net_remain,
                                                net_kill, log_change, army_ratio_after, gross_kills, gross_start,
                                                gross_remain, gross_rein, count ]
 
-    return ['army_ratio_bucket', 'net_start', 'net_rein', 'net_remain',
+    return ['dpf_ratio_bucket', 'net_start', 'net_rein', 'net_remain',
             'net_kill', 'log_change', 'army_ratio_change', 'gross_kills', 'gross_start',
             'gross_remain', 'gross rein', 'count'], complete_buckets
 
