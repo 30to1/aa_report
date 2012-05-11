@@ -47,7 +47,7 @@ def get_report(games, max_frame_gap = 16*20, ignore_end_frames = 16*10, minimum_
             'net_kill', 'log_change', 'army_ratio_change', 'gross_kills', 'gross_start',
             'gross_remain', 'gross rein', 'count'], complete_buckets
 
-
+# get player_fight_costs, NetFightCosts, and Fights each associated by game_id
 def _get_fight_costs( games, max_frame_gap, ignore_end_frames, limit_ratio_change_mult ):
     game_fights = {}
     game_fight_player_costs = {}
