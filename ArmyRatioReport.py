@@ -2,11 +2,14 @@ import math
 import Costs
 import FightUtils
 
-def get_report(games, max_frame_gap = 16*20, ignore_end_frames = 16*10, minimum_gross_losses = 1000):
-    game_fights, game_fight_player_costs, game_fight_net_costs = _get_fight_costs(games, max_frame_gap, ignore_end_frames)
+def get_report(games, max_frame_gap = 16*20, ignore_end_frames = 16*10, minimum_gross_losses = 1000, limit_ratio_change_mult = 1.5):
+    # cost_data contains 3 dict each map game to list of Fights, player_fight_costs, or NetFightCosts respectively
+    cost_data = _get_fight_costs(games, max_frame_gap, ignore_end_frames, limit_ratio_change_mult)
+    game_fights, game_player_fight_costs, game_net_fight_costs = cost_data
+
     working_buckets = {}
     log_count_by_bucket = {}
-    for game_id, fight_net_costs in game_fight_net_costs.iteritems():
+    for game_id, fight_net_costs in game_net_fight_costs.iteritems():
         for net_costs in fight_net_costs:
             if net_costs.army_ratio: # false if skipped due to zeros
                 if net_costs.gross_kills >= minimum_gross_losses:
@@ -28,6 +31,7 @@ def get_report(games, max_frame_gap = 16*20, ignore_end_frames = 16*10, minimum_
         net_remain       = sum( nc.net_remaining    for nc in net_costs ) / count
         net_kill         = sum( nc.net_kills        for nc in net_costs ) / count
         army_ratio_after = sum( nc.army_ratio_after for nc in net_costs ) / count - army_ratio_bucket
+
         log_change       = math.exp( sum( nc.log_ratio_change for nc in net_costs if nc.log_ratio_change ) / log_count )
 
         gross_kills      = sum( nc.gross_kills  for nc in net_costs ) / count
@@ -44,7 +48,7 @@ def get_report(games, max_frame_gap = 16*20, ignore_end_frames = 16*10, minimum_
             'gross_remain', 'gross rein', 'count'], complete_buckets
 
 
-def _get_fight_costs( games, max_frame_gap, ignore_end_frames ):
+def _get_fight_costs( games, max_frame_gap, ignore_end_frames, limit_ratio_change_mult ):
     game_fights = {}
     game_fight_player_costs = {}
     game_fight_net_costs = {}
@@ -55,17 +59,13 @@ def _get_fight_costs( games, max_frame_gap, ignore_end_frames ):
         game_fights[game.game_id] = fights
         game_fight_player_costs[game.game_id] = fight_player_costs
         game_fight_net_costs[game.game_id] = fight_net_costs
-        try:
-            for fight in FightUtils.iter_fights(game, max_frame_gap):
-                fights.append(fight)
-                player_costs = Costs.get_player_fight_costs(game,fight, ignore_end_frames)
-                net_costs = Costs.NetFightCosts(player_costs[0], player_costs[1])
+        for fight in FightUtils.iter_fights(game, max_frame_gap):
+            fights.append(fight)
+            player_costs = Costs.get_player_fight_costs(game,fight, ignore_end_frames)
+            net_costs = Costs.NetFightCosts(player_costs[0], player_costs[1], limit_ratio_change_mult)
 
-                fight_player_costs.append(player_costs)
-                fight_net_costs.append(net_costs)
-        except Exception:
-            final_frame = game.aa_list[len(game.aa_list)-1].died_frame - (ignore_end_frames)
-            print "Exception during fight, participants:", FightUtils.get_fight_participants(game,fight, final_frame)
+            fight_player_costs.append(player_costs)
+            fight_net_costs.append(net_costs)
 
     return game_fights, game_fight_player_costs, game_fight_net_costs
 

@@ -44,7 +44,7 @@ class PlayerFightCosts(object):
 class NetFightCosts(object):
     __slots__ = ["reference_player_index", "army_ratio", "army_ratio_after", "log_ratio_change", "net_start",
                  "net_rein", "net_remaining", "net_kills", "gross_kills", "gross_start", "gross_remain", "gross_rein" ]
-    def __init__(self, p1, p2):
+    def __init__(self, p1, p2, limit_ratio_change_mult = 1.5):
         if p1.start_cost == 0 or p2.start_cost == 0 or p1.remaining_cost == 0 or p2.remaining_cost == 0:
             self.army_ratio = 0
             return
@@ -58,8 +58,13 @@ class NetFightCosts(object):
 
         self.army_ratio = p1.start_cost / float(p2.start_cost)
         self.army_ratio_after = p1.remaining_cost / float(p2.remaining_cost)
-        if self.army_ratio_after > self.army_ratio * 1.5:
-            self.army_ratio_after = self.army_ratio * 1.5
+
+        # smooth out the crazy edges
+        if self.army_ratio_after > self.army_ratio * limit_ratio_change_mult:
+            self.army_ratio_after = self.army_ratio * limit_ratio_change_mult
+        # even out the adjustment
+        elif self.army_ratio_after < self.army_ratio * (1/limit_ratio_change_mult):
+            self.army_ratio_after = self.army_ratio * (1/limit_ratio_change_mult)
 
         if self.army_ratio == 0 or self.army_ratio_after == 0 :
             self.log_ratio_change = None
