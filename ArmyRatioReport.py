@@ -1,7 +1,6 @@
 import math
 import Costs
 import FightUtils
-import Partitions
 
 def get_report(games, max_frame_gap = 16*20, ignore_end_frames = 16*10, minimum_gross_losses = 1000):
     game_fights, game_fight_player_costs, game_fight_net_costs = _get_fight_costs(games, max_frame_gap, ignore_end_frames)
@@ -66,7 +65,10 @@ def _get_fight_costs( games, max_frame_gap, ignore_end_frames ):
                 fight_net_costs.append(net_costs)
         except Exception:
             final_frame = game.aa_list[len(game.aa_list)-1].died_frame - (ignore_end_frames)
-            print "Exception during fight, participants:", FightUtils.get_fight_participants(game,fight, final_frame)
+            if fight:
+                print "Exception during fight, participants:", FightUtils.get_fight_participants(game, fight, final_frame)
+            else:
+                print "Exception during fight processing"
 
     return game_fights, game_fight_player_costs, game_fight_net_costs
 
